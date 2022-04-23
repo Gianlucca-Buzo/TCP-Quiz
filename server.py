@@ -2,18 +2,33 @@ from socket import *
 import mysql.connector
 import json
 import random
+import yaml
 
-connection_code = 1500
-serverPort = 8080
+with open('application.yml') as f:
+    data = yaml.load(f, Loader=yaml.FullLoader)
+
+size = data['size']
+serverPort = data['serverPort']
 serverSocket = socket(AF_INET,SOCK_STREAM)
 serverSocket.bind(('localhost',serverPort))
 serverSocket.listen(1)
 letras = ['a','b','c','d','e']
-mysql_cnx = mysql.connector.connect(user='root', password='lucca2021',
-                              host='localhost',
-                              database='quiz')
+mysql_cnx = mysql.connector.connect(user=data['mysql_user'], password=data['mysql_password'],
+                              host=data['mysql_host'],
+                              database=data['mysql_database'])
+cursor = mysql_cnx.cursor()
 
-# choice = input(Fore.CYAN + f"\n Bem vindo ao Quiz {name}\n O que deseja fazer?\n 1 - Jogar um Quiz\n 2 - Listar os Quiz existentes\n 3 - Criar um Quiz\n ")
+
+def salvaQuiz(pin,json):
+    query = (f"INSERT INTO Quizzes (Pin,Quiz_Json) VALUES ({pin},{json});")
+    cursor.execute(query)
+    result = cursor.fetchone()
+    if result[0] == 1:
+        return True
+    else:
+        return False
+
+
 def criaQuizManualmente():
     envia("Digite a descricao do Quiz: ")
     descricao = recebe()
@@ -22,7 +37,7 @@ def criaQuizManualmente():
     json_questao['pin'] = pin
     json_questao['descricao'] = descricao
     perguntas = dict()
-    for i in range(1,2):
+    for i in range(1,6):
         pergunta = dict()
         envia(f"Digite a perguna numero {i}: ")
         textoQuestao = recebe()
@@ -43,6 +58,7 @@ def criaQuizManualmente():
     json_questao['perguntas'] = perguntas
     envia(f"Quiz criado pin: {pin}")
     print(json.dumps(json_questao, indent=4))
+    salvaQuiz(pin,json_questao)
 
 
 def criaQuiz():
@@ -61,7 +77,7 @@ def envia(mensagem):
     connection.sendall(mensagem.encode())
 
 def recebe():
-    return connection.recv(connection_code).decode()
+    return connection.recv(size).decode()
 
 
 
