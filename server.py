@@ -19,18 +19,32 @@ mysql_cnx = mysql.connector.connect(user=data['mysql_user'], password=data['mysq
 cursor = mysql_cnx.cursor()
 
 
-def salvaQuiz(pin,json):
-    query = (f"INSERT INTO Quizzes (Pin,Quiz_Json) VALUES ({pin},{json});")
+def selecionarQuiz(pin):
+    query = (f'SELECT Quiz_Json FROM Quizzes WHERE Pin = {pin};')
     cursor.execute(query)
-    result = cursor.fetchone()
-    if result[0] == 1:
-        return True
-    else:
-        return False
+    for row in cursor:
+        json_acceptable_string = row[0].replace("'", "\"")
+        quiz_json = json.loads(json_acceptable_string)
+    return quiz_json
+
+
+def listarQuizzes():
+    query = (f'SELECT * FROM Quizzes;')
+    cursor.execute(query)
+    for row in cursor:
+        pin = row[0]
+        json_acceptable_string = row[1].replace("'", "\"")
+        quiz_json = json.loads(json_acceptable_string)
+        descricao = quiz_json["descricao"]
+        envia(f'\nPin: {pin}\nDescricao: {descricao}\n')
+
+def salvaQuiz(pin,json):
+    query = (f'INSERT INTO Quizzes (Pin,Quiz_Json) VALUES ("{pin}","{json}");')
+    cursor.execute(query)
 
 
 def criaQuizManualmente():
-    envia("Digite a descricao do Quiz: ")
+    envia("\nDigite a descricao do Quiz: ")
     descricao = recebe()
     json_questao = dict()
     pin = str(random.randint(999,9999))
@@ -62,7 +76,7 @@ def criaQuizManualmente():
 
 
 def criaQuiz():
-    envia("Criar Quiz: \n 1 - JSON\n 2 - Manualmente")
+    envia("\nCriar Quiz: \n 1 - JSON\n 2 - Manualmente\n")
     opcao = recebe()
     if opcao == "1":
         envia("Digite o JSON do Quiz: ")
@@ -87,12 +101,14 @@ if __name__ == '__main__':
         connection, clientAddress = serverSocket.accept()
         nome = recebe()
         while 1:
-            envia(f"\n Bem vindo ao Quiz {nome}\n O que deseja fazer?\n 1 - Jogar um Quiz\n 2 - Listar os Quizzes existentes\n 3 - Criar um Quiz\n 4 - Sair\n ")
+            envia(f"\n Bem vindo ao Quiz, {nome}\n O que deseja fazer?\n 1 - Jogar um Quiz\n 2 - Listar os Quizzes existentes\n 3 - Criar um Quiz\n 4 - Sair\n ")
             opcao = recebe()
             if opcao == "1":
                 envia("Digite o pin do Quiz: ")
+                pin = recebe()
+                selecionarQuiz(pin)
             elif opcao == "2":
-                envia("Listar")
+                listarQuizzes()
             elif opcao == "3":
                 criaQuiz()
             elif opcao == "4":
