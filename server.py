@@ -69,18 +69,20 @@ if __name__ == '__main__':
     print("Quiz server is on!")
     while 1:
         connection, clientAddress = serverSocket.accept()
-        nome = connection.recv(1500).decode()
+        nome = recebe()
         while 1:
-            connection.sendall(f"\n Bem vindo ao Quiz {nome}\n O que deseja fazer?\n 1 - Jogar um Quiz\n 2 - Listar os Quizzes existentes\n 3 - Criar um Quiz\n 4 - Sair\n ".encode())
-            opcao = connection.recv(1500).decode()
+            envia(f"\n Bem vindo ao Quiz {nome}\n O que deseja fazer?\n 1 - Jogar um Quiz\n 2 - Listar os Quizzes existentes\n 3 - Criar um Quiz\n 4 - Sair\n ")
+            opcao = recebe()
             if opcao == "1":
-                connection.sendall("Digite o pin do Quiz: ".encode())
+                envia("Digite o pin do Quiz: ")
             elif opcao == "2":
-                connection.sendall("Listar".encode())
+                envia("Listar")
             elif opcao == "3":
                 criaQuiz()
+            elif opcao == "4":
+                break
             else:
-                connection.sendall("Opcao Invalida!".encode())
+                envia("Opcao Invalida!")
         connection.close()
 
 
