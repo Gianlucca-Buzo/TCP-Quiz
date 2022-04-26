@@ -18,6 +18,11 @@ mysql_cnx = mysql.connector.connect(user=data['mysql_user'], password=data['mysq
                               database=data['mysql_database'])
 cursor = mysql_cnx.cursor()
 
+def salvaPontuacao (usuario,pin,pontuacao):
+    query = (f'INSERT INTO Pontuacoes (Pin,Usuario,Pontuacao) VALUES ("{pin}","{usuario}","{pontuacao}");')
+    cursor.execute(query)
+    mysql_cnx.commit()
+
 
 def selecionarQuiz(pin):
     query = (f'SELECT Quiz_Json FROM Quizzes WHERE Pin = {pin};')
@@ -41,6 +46,7 @@ def listarQuizzes():
 def salvaQuiz(pin,json):
     query = (f'INSERT INTO Quizzes (Pin,Quiz_Json) VALUES ("{pin}","{json}");')
     cursor.execute(query)
+    mysql_cnx.commit()
 
 
 def criaQuizManualmente():
@@ -99,14 +105,15 @@ if __name__ == '__main__':
     print("Quiz server is on!")
     while 1:
         connection, clientAddress = serverSocket.accept()
-        nome = recebe()
+        usuario = recebe()
         while 1:
-            envia(f"\n Bem vindo ao Quiz, {nome}\n O que deseja fazer?\n 1 - Jogar um Quiz\n 2 - Listar os Quizzes existentes\n 3 - Criar um Quiz\n 4 - Sair\n ")
+            envia(f"\n Bem vindo ao Quiz, {usuario}\n O que deseja fazer?\n 1 - Jogar um Quiz\n 2 - Listar os Quizzes existentes\n 3 - Criar um Quiz\n 4 - Sair\n ")
             opcao = recebe()
             if opcao == "1":
                 envia("Digite o pin do Quiz: ")
                 pin = recebe()
-                selecionarQuiz(pin)
+                quiz_json = selecionarQuiz(pin)
+                salvaPontuacao(usuario,pin,5) #Teste
             elif opcao == "2":
                 listarQuizzes()
             elif opcao == "3":

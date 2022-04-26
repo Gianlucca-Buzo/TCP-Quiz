@@ -5,7 +5,7 @@ serverPort= 8080
 clientSocket = socket(AF_INET, SOCK_STREAM)
 server = (serverName,serverPort)
 clientSocket.connect(server)
-message= input( ' Digite seu nome: ' )
+message= input( ' Digite seu usuario: ' )
 while 1:
     clientSocket.send(message.encode())
     modifiedMessage, serverAddress=clientSocket.recvfrom(1500)
