@@ -18,6 +18,15 @@ mysql_cnx = mysql.connector.connect(user=data['mysql_user'], password=data['mysq
                               database=data['mysql_database'])
 cursor = mysql_cnx.cursor()
 
+def verifica_cursor(cursor):
+    for x in cursor:
+        return True
+    return False
+
+def existe_pontuacao (pin,usuario):
+    cursor.execute(f'SELECT Pontuacao FROM Pontuacoes WHERE Pin = "{pin}" AND Usuario = "{usuario}"')
+    return verifica_cursor(cursor)
+
 def salvaPontuacao (usuario,pin,pontuacao):
     query = (f'INSERT INTO Pontuacoes (Pin,Usuario,Pontuacao) VALUES ("{pin}","{usuario}","{pontuacao}");')
     cursor.execute(query)
@@ -27,6 +36,7 @@ def salvaPontuacao (usuario,pin,pontuacao):
 def selecionarQuiz(pin):
     query = (f'SELECT Quiz_Json FROM Quizzes WHERE Pin = {pin};')
     cursor.execute(query)
+    quiz_json = None
     for row in cursor:
         json_acceptable_string = row[0].replace("'", "\"")
         quiz_json = json.loads(json_acceptable_string)
@@ -112,17 +122,22 @@ if __name__ == '__main__':
             if opcao == "1":
                 envia("Digite o pin do Quiz: ")
                 pin = recebe()
-                quiz_json = selecionarQuiz(pin)
-                salvaPontuacao(usuario,pin,5) #Teste
+                if not existe_pontuacao(pin,usuario):
+                    quiz_json = selecionarQuiz(pin)
+                    if quiz_json == None:
+                        envia("\nNao existe quiz com esse PIN!\n")
+                    else:
+                        salvaPontuacao(usuario,pin,5) #Teste
+                else:
+                    envia("\nVoce ja jogou esse quiz antes!\n")
             elif opcao == "2":
                 listarQuizzes()
             elif opcao == "3":
                 criaQuiz()
             elif opcao == "4":
-                break
+                connection.close()
             else:
                 envia("Opcao Invalida!")
-        connection.close()
 
 
 
