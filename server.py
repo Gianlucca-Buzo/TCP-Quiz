@@ -18,6 +18,17 @@ mysql_cnx = mysql.connector.connect(user=data['mysql_user'], password=data['mysq
                               database=data['mysql_database'])
 cursor = mysql_cnx.cursor()
 
+# NAO ESTA PRINTANDO DE FORMA ORDENADA
+def listaPontuacoes (pin):
+    query = (f'SELECT Usuario,Pontuacao FROM Pontuacoes WHERE Pin = "{pin}";')
+    cursor.execute(query)
+    envia(f'\nUSUARIO - PONTUACAO')
+    for row in cursor:
+        usuario = row[0]
+        pontuacao = row[1]
+        envia(f'\n{usuario} - {pontuacao}')
+
+
 def verifica_cursor(cursor):
     for x in cursor:
         return True
@@ -117,7 +128,7 @@ if __name__ == '__main__':
         connection, clientAddress = serverSocket.accept()
         usuario = recebe()
         while 1:
-            envia(f"\n Bem vindo ao Quiz, {usuario}\n O que deseja fazer?\n 1 - Jogar um Quiz\n 2 - Listar os Quizzes existentes\n 3 - Criar um Quiz\n 4 - Sair\n ")
+            envia(f"\n Bem vindo ao Quiz, {usuario}\n O que deseja fazer?\n 1 - Jogar um Quiz\n 2 - Listar os Quizzes existentes\n 3 - Criar um Quiz\n 4 - Visualizar Ranking \n 5 - Sair\n ")
             opcao = recebe()
             if opcao == "1":
                 envia("Digite o pin do Quiz: ")
@@ -135,6 +146,10 @@ if __name__ == '__main__':
             elif opcao == "3":
                 criaQuiz()
             elif opcao == "4":
+                envia("Digite o pin do Quiz: ")
+                pin = recebe()
+                listaPontuacoes(pin)
+            elif opcao == "5":
                 connection.close()
             else:
                 envia("Opcao Invalida!")
