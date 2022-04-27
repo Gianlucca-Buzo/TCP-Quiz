@@ -18,15 +18,14 @@ mysql_cnx = mysql.connector.connect(user=data['mysql_user'], password=data['mysq
                               database=data['mysql_database'])
 cursor = mysql_cnx.cursor()
 
-# NAO ESTA PRINTANDO DE FORMA ORDENADA
 def listaPontuacoes (pin):
-    query = (f'SELECT Usuario,Pontuacao FROM Pontuacoes WHERE Pin = "{pin}";')
+    query = (f'SELECT Usuario,Pontuacao FROM Pontuacoes WHERE Pin = "{pin}" ORDER BY (Pontuacao) DESC;')
     cursor.execute(query)
-    envia(f'\nUSUARIO - PONTUACAO')
+    envia(f'\nUSUARIO - PONTUACAO\n')
     for row in cursor:
         usuario = row[0]
         pontuacao = row[1]
-        envia(f'\n{usuario} - {pontuacao}')
+        envia(f'{usuario} - {pontuacao}\n')
 
 
 def verifica_cursor(cursor):
