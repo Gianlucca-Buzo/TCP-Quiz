@@ -1,6 +1,6 @@
 size : 1500
 serverPort : 8080
 mysql_user: root
-mysql_password: gzvnpy
-mysql_host: 127.0.0.1
+mysql_password: lucca2021
+mysql_host: localhost
 mysql_database: tcp_quiz  
