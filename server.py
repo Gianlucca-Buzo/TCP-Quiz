@@ -3,6 +3,7 @@ import mysql.connector
 import json
 import random
 import yaml
+from colorama import Fore
 
 with open('application.yml') as f:
     data = yaml.load(f, Loader=yaml.FullLoader)
@@ -18,15 +19,16 @@ mysql_cnx = mysql.connector.connect(user=data['mysql_user'], password=data['mysq
                               database=data['mysql_database'])
 cursor = mysql_cnx.cursor()
 
-# NAO ESTA PRINTANDO DE FORMA ORDENADA
 def listaPontuacoes (pin):
-    query = (f'SELECT Usuario,Pontuacao FROM Pontuacoes WHERE Pin = "{pin}";')
+    query = (f'SELECT Usuario,Pontuacao FROM Pontuacoes WHERE Pin = "{pin}" ORDER BY (Pontuacao) DESC;')
     cursor.execute(query)
     envia(f'\nUSUARIO - PONTUACAO')
+    lista = ''
     for row in cursor:
         usuario = row[0]
         pontuacao = row[1]
-        envia(f'\n{usuario} - {pontuacao}')
+        lista = lista + f'\n{usuario} - {pontuacao}'
+    envia(lista+ '\n')
 
 
 def verifica_cursor(cursor):
@@ -57,20 +59,47 @@ def selecionarQuiz(pin):
 def listarQuizzes():
     query = (f'SELECT * FROM Quizzes;')
     cursor.execute(query)
+    i = 1
+    lista = ''
     for row in cursor:
         pin = row[0]
         json_acceptable_string = row[1].replace("'", "\"")
         quiz_json = json.loads(json_acceptable_string)
         descricao = quiz_json["descricao"]
-        envia(f'\nPin: {pin}\nDescricao: {descricao}\n')
+        lista = lista + f'Quiz {i}: Pin: {pin} Descricao: {descricao}\n'
+        i += 1
+    envia(lista)
 
 def salvaQuiz(pin,json):
     query = (f'INSERT INTO Quizzes (Pin,Quiz_Json) VALUES ("{pin}","{json}");')
     cursor.execute(query)
     mysql_cnx.commit()
 
+def jogar(usuario,pin):
+    quiz = selecionarQuiz(pin)
+    perguntas = quiz['perguntas']
+    respostas_corretas = 0
+    for i in range(1,6):
+        pergunta = perguntas[str(i)]
+        questao_string = f"\nQuestao {i}: {pergunta['textoQuestao']}\n"
+        alternativas = pergunta['alternativas']
+        for letra in letras:
+            questao_string = questao_string + f"{letra}) {alternativas[letra]} \n"
+        envia(questao_string)
+        resposta = recebe()
+        if(resposta == pergunta['alternativaCorreta']):
+            respostas_corretas += 1
+            envia(Fore.GREEN+' Resposta Correta'+Fore.WHITE)
+        else:
+            envia(Fore.RED + " Resposta Incorreta"+Fore.WHITE)
+    
+    salvaPontuacao(usuario,pin,respostas_corretas)
+    envia(Fore.GREEN+f' Voce acertou {respostas_corretas} questoes\n\nRank: \n'+Fore.WHITE)
+    listaPontuacoes(pin)
 
-def criaQuizManualmente():
+    
+
+def criaQuiz():
     envia("\nDigite a descricao do Quiz: ")
     descricao = recebe()
     json_questao = dict()
@@ -102,17 +131,6 @@ def criaQuizManualmente():
     salvaQuiz(pin,json_questao)
 
 
-def criaQuiz():
-    envia("\nCriar Quiz: \n 1 - JSON\n 2 - Manualmente\n")
-    opcao = recebe()
-    if opcao == "1":
-        envia("Digite o JSON do Quiz: ")
-        json_quiz = recebe()
-        print(f"Json recebido {json_quiz}")
-    elif opcao == "2":
-        criaQuizManualmente()
-    else:
-        envia("Opcao Invalida!")
         
 def envia(mensagem):
     connection.sendall(mensagem.encode())
@@ -138,7 +156,8 @@ if __name__ == '__main__':
                     if quiz_json == None:
                         envia("\nNao existe quiz com esse PIN!\n")
                     else:
-                        salvaPontuacao(usuario,pin,5) #Teste
+                        jogar(usuario,pin)
+                        #salvaPontuacao(usuario,pin,5) #Teste
                 else:
                     envia("\nVoce ja jogou esse quiz antes!\n")
             elif opcao == "2":
