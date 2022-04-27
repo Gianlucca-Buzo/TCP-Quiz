@@ -19,7 +19,7 @@ mysql_cnx = mysql.connector.connect(user=data['mysql_user'], password=data['mysq
 cursor = mysql_cnx.cursor()
 
 def listaPontuacoes (pin):
-    query = (f'SELECT Usuario,Pontuacao FROM Pontuacoes WHERE Pin = "{pin}" ORDER BY (Pontuacao) DESC;')
+    query = (f'SELECT Usuario,Pontuacao FROM Pontuacoes WHERE Pin = "{pin}";')
     cursor.execute(query)
     envia(f'\nUSUARIO - PONTUACAO\n')
     for row in cursor:
