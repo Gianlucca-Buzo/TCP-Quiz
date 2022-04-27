@@ -129,7 +129,6 @@ def criaQuiz(connection):
         perguntas[str(i)] = pergunta
     json_questao['perguntas'] = perguntas
     envia(connection,f"Quiz criado pin: {pin}")
-    print(json.dumps(json_questao, indent=4))
     salvaQuiz(pin,json_questao)
 
 
@@ -157,7 +156,6 @@ def novoCliente(connection,clientAddress):
                     envia(connection,"\nNao existe quiz com esse PIN!\n")
                 else:
                     jogar(usuario,pin,connection)
-                    #salvaPontuacao(usuario,pin,5) #Teste
             else:
                 envia(connection,"\nVoce ja jogou esse quiz antes!\n")
         elif opcao == "2":
@@ -169,7 +167,9 @@ def novoCliente(connection,clientAddress):
             pin = recebe(connection)
             listaPontuacoes(connection,pin)
         elif opcao == "5":
+            envia(connection,'Fechando Conexao')
             connection.close()
+            print(f"Conexao com {usuario} fechada")
             exit(0)
         else:
             envia(connection,"Opcao Invalida!")
@@ -180,6 +180,7 @@ if __name__ == '__main__':
     while 1:
         connection, clientAddress = serverSocket.accept()
         threading.Thread(target=novoCliente,args=(connection,clientAddress)).start()
+    serverSocket.close()
 
         
 

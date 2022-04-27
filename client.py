@@ -10,8 +10,12 @@ while 1:
     clientSocket.send(message.encode())
     modifiedMessage, serverAddress=clientSocket.recvfrom(1500)
     print(modifiedMessage.decode())
+    if(modifiedMessage.decode() == 'Fechando Conexao'):
+        break
     message = input(' ')
 clientSocket.close()
+print('Conexao Fechada')
+
 
 
 # from socket import *
