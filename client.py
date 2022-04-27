@@ -15,19 +15,3 @@ while 1:
     message = input(' ')
 clientSocket.close()
 print('Conexao Fechada')
-
-
-
-# from socket import *
-# serverName='localhost'
-# serverPort= 8082
-# tcp_client = socket(AF_INET, SOCK_STREAM)
-# tcp_client.connect((serverName,serverPort))
-# print ('Para digite \"exit\"')
-# message = input( ' Digite sua mensagem: ' )
-# while message != 'exit':
-#     tcp_client.send(message.encode())
-#     modifiedMessage, serverAddress = tcp_client.recvfrom(1500)
-#     print(modifiedMessage.decode())
-#     message = input()
-# tcp_client.close()
