@@ -3,6 +3,7 @@
 ## Requisitos
 
 MySQL
+
 Python 3.*
 
 ## Configuração
