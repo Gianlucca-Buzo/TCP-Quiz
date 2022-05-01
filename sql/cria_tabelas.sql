@@ -1,4 +1,3 @@
-DROP DATABASE tcp_quiz;
 CREATE DATABASE tcp_quiz;
 USE tcp_quiz;
 
