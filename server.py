@@ -22,8 +22,7 @@ cursor = mysql_cnx.cursor()
 def listaPontuacoes (pin):
     query = (f'SELECT Usuario,Pontuacao FROM Pontuacoes WHERE Pin = "{pin}" ORDER BY (Pontuacao) DESC;')
     cursor.execute(query)
-    envia(f'\nUSUARIO - PONTUACAO')
-    lista = ''
+    lista = f'\nUSUARIO - PONTUACAO'
     for row in cursor:
         usuario = row[0]
         pontuacao = row[1]
@@ -174,31 +173,3 @@ if __name__ == '__main__':
                 envia("Opcao Invalida!")
 
 
-
-
-# Descrição: Quiz com alternativas, um cliente manda as perguntas e respostas para o servidor e 
-# outros clientes podem jogar o quiz. Ao final do quiz, o servidor retorna para o cliente a posição dele 
-# no ranking.
-# from socket import *
-
-# def alterMessage(message):
-# 	tipo = message[0:2]
-# 	original_message = message[2:]
-# 	if(tipo == 'CA'):
-# 		return original_message.lower()
-# 	else:
-# 		if(tipo == 'CB'):
-# 			return original_message.upper()
-# 		else:
-# 			return original_message
-
-
-# serverPort = 8082
-# tcp_server = socket(AF_INET,SOCK_STREAM)
-# tcp_server.bind(('localhost',serverPort))
-# tcp_server.listen(1)
-# while 1:
-# 	con, cliente = tcp_server.accept()
-# 	message = con.recv(1500)
-# 	modifiedMessage = alterMessage(message.decode())
-# 	con.send(modifiedMessage.encode())
